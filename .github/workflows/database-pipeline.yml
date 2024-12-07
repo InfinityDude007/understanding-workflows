@@ -2,22 +2,46 @@ name: Database Setup Pipeline
 
 on:
     workflow_run:
-      workflows: ["Docker CI/CD Pipeline"]
+      workflows: [Docker CI/CD Pipeline]
       types:
         - completed
 
 jobs:
   database-setup:
     runs-on: ubuntu-latest
+
     steps:
       - name: Check out code
         uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Set up virtual environment
+        run: |
+          python -m venv venv
+
+      - name: Clear pip cache
+        run: |
+          rm -rf ~/.cache/pip
+
+      - name: Install dependencies
+        run: |
+          source venv/bin/activate
+          python -m pip install --upgrade pip
+          pip install -r server/requirements.txt
+          pip freeze
+          pip show asyncpg
 
       - name: Run database setup
-        run: python -c 'from server.database import create_database; import asyncio; asyncio.run(create_database())'
+        run: |
+          source venv/bin/activate
+          PYTHONPATH=$(pwd) python -m server.database -c "import asyncio; asyncio.run(create_database())"
         env:
           DATABASE_USER: ${{ secrets.DATABASE_USER }}
           DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
-          DATABASE_HOST: localhost
+          DATABASE_HOST: postgres
           DATABASE_PORT: 5432
           DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
