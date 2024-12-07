@@ -11,9 +11,20 @@ on:
 jobs:
   database-setup:
     runs-on: ubuntu-latest
+
     steps:
       - name: Check out code
         uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt  # Ensure asyncpg is installed via requirements.txt
 
       - name: Run database setup
         run: python -c 'from server.database import create_database; import asyncio; asyncio.run(create_database())'
