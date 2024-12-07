@@ -22,20 +22,23 @@ jobs:
       - name: Set up virtual environment
         run: |
           python -m venv venv
-          source venv/bin/activate
 
       - name: Install dependencies
         run: |
+          source venv/bin/activate
           python -m pip install --upgrade pip
-          pip -m install -r server/requirements.txt
+          pip install -r server/requirements.txt
 
       - name: Verify installed packages
         run: |
-          pip show asyncpg  # Check if asyncpg is installed
+          source venv/bin/activate
+          pip show asyncpg
           pip freeze
 
       - name: Run database setup
-        run: python -c 'from server.database import create_database; import asyncio; asyncio.run(create_database())'
+        run: |
+          source venv/bin/activate
+          python -c 'from server.database import create_database; import asyncio; asyncio.run(create_database())'
         env:
           DATABASE_USER: ${{ secrets.DATABASE_USER }}
           DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
