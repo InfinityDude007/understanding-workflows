@@ -23,17 +23,17 @@ jobs:
         run: |
           python -m venv venv
 
+      - name: Clear pip cache
+        run: |
+          rm -rf ~/.cache/pip
+
       - name: Install dependencies
         run: |
           source venv/bin/activate
           python -m pip install --upgrade pip
           pip install -r server/requirements.txt
-
-      - name: Verify installed packages
-        run: |
-          source venv/bin/activate
-          pip show asyncpg
           pip freeze
+          pip show asyncpg
 
       - name: Run database setup
         run: |
