@@ -1,0 +1,23 @@
+name: Database Setup Pipeline
+
+on:
+    workflow_run:
+      workflows: ["Docker CI/CD Pipeline"]
+      types:
+        - completed
+
+jobs:
+  database-setup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Run database setup
+        run: python -c 'from server.database import create_database; import asyncio; asyncio.run(create_database())'
+        env:
+          DATABASE_USER: ${{ secrets.DATABASE_USER }}
+          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+          DATABASE_HOST: localhost
+          DATABASE_PORT: 5432
+          DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
