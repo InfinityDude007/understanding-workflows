@@ -1,10 +1,12 @@
 name: Database Setup Pipeline
 
 on:
-    workflow_run:
-      workflows: ["Docker CI/CD Pipeline"]
-      types:
-        - completed
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   database-setup:
